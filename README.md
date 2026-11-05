@@ -8,7 +8,7 @@
 | **Server GNS3** | Group C — `10.4.89.250` |
 | **Prefix IP** | `10.90.x.x` |
 | **Anggota (bagian CIDR + GNS3)** | Annabel Clarissa — NRP 5027251016 |
-| **Anggota (bagian VLSM + Cisco Packet Tracer)** | _isi nama dan NRP partner_ |
+| **Anggota (bagian VLSM + Cisco Packet Tracer)** | Nayla Aisha Hanifa (5027251075) |
 
 Repositori ini memuat laporan **bagian GNS3 dengan metode CIDR**. Bagian Cisco Packet Tracer (metode VLSM) dikerjakan anggota kelompok yang lain, sesuai ketentuan soal bahwa kedua tools memakai metode classless yang berbeda.
 
@@ -589,3 +589,513 @@ Keluaran yang diharapkan hanyalah `selesai` tanpa baris `GAGAL`.
 
 **Mengapa totalnya /19?** Jumlah seluruh blok subnet adalah 4188 alamat, melebihi 4096 (`/20`), sehingga blok terkecil yang dapat menampung adalah `/19`. Hal ini juga berlaku untuk metode VLSM.
 
+# Bagian VLSM + Cisco Packet Tracer
+
+Cisco Packet Tracer memakai metode **VLSM**.
+
+## V1. Topologi dan Urutan Kabel (CPT)
+
+![alt text](assets/uuuu.png)
+
+Link router ke router memakai kabel **Copper Cross-Over**, link router ke switch memakai **Straight-Through**, dan router 2811 dilengkapi modul **NM-2FE2W** untuk menambah port FastEthernet.
+
+| Router | Port | Alamat | Terhubung ke |
+|---|---|---|---|
+| Cyberia | fa0/1 | `10.90.14.1/25` | JJ, MyuMyu |
+| Cyberia | fa1/0 | `10.90.16.57/30` | Wired |
+| Wired | fa1/0 | `10.90.16.58/30` | Cyberia |
+| Wired | fa0/1 | `10.90.16.61/30` | Navi |
+| Wired | fa1/1 | `10.90.16.65/30` | Tachibana |
+| Wired | fa0/0 | `10.90.16.33/29` | Psyche, Copland, Schumann |
+| Navi | fa0/0 | `10.90.16.62/30` | Wired |
+| Navi | fa1/0 | `10.90.12.1/24` | Alice, Reika |
+| Navi | fa0/1 | `10.90.15.65/26` | Taro |
+| Navi | fa1/1 | `10.90.13.1/24` | Yasuo, Miho, Kuma |
+| Tachibana | fa1/0 | `10.90.16.66/30` | Wired |
+| Tachibana | fa0/0 | `10.90.10.1/23` | Collective, Ghost |
+| Tachibana | fa0/1 | `10.90.16.73/30` | Deus |
+| Psyche | fa0/0 | `10.90.16.34/29` | Wired, Copland, Schumann |
+| Psyche | fa0/1 | `10.90.0.1/22` | Karl, Lin |
+| Copland | fa0/0 | `10.90.16.35/29` | Wired, Psyche, Schumann |
+| Copland | fa0/1 | `10.90.15.1/26` | Juri |
+| Copland | fa1/0 | `10.90.8.1/23` | Masayuki |
+| Schumann | fa0/0 | `10.90.16.36/29` | Wired, Psyche, Copland |
+| Schumann | fa0/1 | `10.90.16.41/29` | Akashic |
+| Schumann | fa1/0 | `10.90.16.69/30` | Accela |
+| Accela | fa0/1 | `10.90.16.70/30` | Schumann |
+| Accela | fa0/0 | `10.90.4.1/22` | Omnipresence, Denpa |
+| Deus | fa0/1 | `10.90.16.74/30` | Tachibana |
+| Deus | fa0/0 | `10.90.14.129/25` | Lilith, Specter |
+| Deus | fa1/0 | `10.90.16.77/30` | Protocol7 |
+| Protocol7 | fa0/1 | `10.90.16.78/30` | Deus |
+| Protocol7 | fa0/0 | `10.90.15.129/26` | Chisa, Hodgeson |
+| Protocol7 | fa1/0 | `10.90.16.81/30` | Knights |
+| Knights | fa0/1 | `10.90.16.82/30` | Protocol7 |
+| Knights | fa0/0 | `10.90.16.49/29` | Eiri |
+| Knights | fa1/0 | `10.90.16.85/30` | Phantoma |
+| Phantoma | fa1/0 | `10.90.16.86/30` | Knights |
+| Phantoma | fa0/1 | `10.90.16.1/27` | Semi |
+| Phantoma | fa0/0 | `10.90.16.89/30` | Shibuya |
+| Shibuya | fa0/0 | `10.90.16.90/30` | Phantoma |
+| Shibuya | fa0/1 | `10.90.15.193/26` | Lain, Mika |
+
+Cyberia juga terhubung ke Cloud-PT melalui `fa0/0`; link ini di luar perhitungan subnet.
+
+## V2. Perhitungan IP dengan VLSM
+
+### V2.1 Langkah
+
+Kebutuhan IP dan netmask tiap subnet memakai tabel pada bagian 4.2, dan root `10.90.0.0/19` sama dengan bagian 8.
+
+1. Urutkan subnet **dari blok terbesar ke terkecil** (ukuran sama diurutkan menurut nomor A).
+2. Alokasikan berurutan dari alamat terendah root. Tiap blok otomatis berada pada batas pangkat dua sehingga tidak ada celah maupun tumpang tindih.
+
+### V2.2 Urutan alokasi
+
+| Urutan | Subnet | Prefix | Network ID |
+|---|---|---|---|
+| 1 | A6 | /22 | `10.90.0.0/22` |
+| 2 | A11 | /22 | `10.90.4.0/22` |
+| 3 | A8 | /23 | `10.90.8.0/23` |
+| 4 | A15 | /23 | `10.90.10.0/23` |
+| 5 | A12 | /24 | `10.90.12.0/24` |
+| 6 | A14 | /24 | `10.90.13.0/24` |
+| 7 | A1 | /25 | `10.90.14.0/25` |
+| 8 | A17 | /25 | `10.90.14.128/25` |
+| 9 | A7 | /26 | `10.90.15.0/26` |
+| 10 | A13 | /26 | `10.90.15.64/26` |
+| 11 | A19 | /26 | `10.90.15.128/26` |
+| 12 | A25 | /26 | `10.90.15.192/26` |
+| 13 | A23 | /27 | `10.90.16.0/27` |
+| 14 | A5 | /29 | `10.90.16.32/29` |
+| 15 | A9 | /29 | `10.90.16.40/29` |
+| 16 | A21 | /29 | `10.90.16.48/29` |
+| 17 | A2 | /30 | `10.90.16.56/30` |
+| 18 | A3 | /30 | `10.90.16.60/30` |
+| 19 | A4 | /30 | `10.90.16.64/30` |
+| 20 | A10 | /30 | `10.90.16.68/30` |
+| 21 | A16 | /30 | `10.90.16.72/30` |
+| 22 | A18 | /30 | `10.90.16.76/30` |
+| 23 | A20 | /30 | `10.90.16.80/30` |
+| 24 | A22 | /30 | `10.90.16.84/30` |
+| 25 | A24 | /30 | `10.90.16.88/30` |
+
+Alokasi berakhir di `10.90.16.91`: total 4.188 alamat tanpa celah.
+
+### V2.3 Hasil pembagian (sheet Pembagian IP - VLSM)
+
+| Subnet | Network ID | Netmask | Broadcast | Range IP |
+|---|---|---|---|---|
+| A1 | `10.90.14.0` | `255.255.255.128` | `10.90.14.127` | `10.90.14.1 - 10.90.14.126` |
+| A2 | `10.90.16.56` | `255.255.255.252` | `10.90.16.59` | `10.90.16.57 - 10.90.16.58` |
+| A3 | `10.90.16.60` | `255.255.255.252` | `10.90.16.63` | `10.90.16.61 - 10.90.16.62` |
+| A4 | `10.90.16.64` | `255.255.255.252` | `10.90.16.67` | `10.90.16.65 - 10.90.16.66` |
+| A5 | `10.90.16.32` | `255.255.255.248` | `10.90.16.39` | `10.90.16.33 - 10.90.16.38` |
+| A6 | `10.90.0.0` | `255.255.252.0` | `10.90.3.255` | `10.90.0.1 - 10.90.3.254` |
+| A7 | `10.90.15.0` | `255.255.255.192` | `10.90.15.63` | `10.90.15.1 - 10.90.15.62` |
+| A8 | `10.90.8.0` | `255.255.254.0` | `10.90.9.255` | `10.90.8.1 - 10.90.9.254` |
+| A9 | `10.90.16.40` | `255.255.255.248` | `10.90.16.47` | `10.90.16.41 - 10.90.16.46` |
+| A10 | `10.90.16.68` | `255.255.255.252` | `10.90.16.71` | `10.90.16.69 - 10.90.16.70` |
+| A11 | `10.90.4.0` | `255.255.252.0` | `10.90.7.255` | `10.90.4.1 - 10.90.7.254` |
+| A12 | `10.90.12.0` | `255.255.255.0` | `10.90.12.255` | `10.90.12.1 - 10.90.12.254` |
+| A13 | `10.90.15.64` | `255.255.255.192` | `10.90.15.127` | `10.90.15.65 - 10.90.15.126` |
+| A14 | `10.90.13.0` | `255.255.255.0` | `10.90.13.255` | `10.90.13.1 - 10.90.13.254` |
+| A15 | `10.90.10.0` | `255.255.254.0` | `10.90.11.255` | `10.90.10.1 - 10.90.11.254` |
+| A16 | `10.90.16.72` | `255.255.255.252` | `10.90.16.75` | `10.90.16.73 - 10.90.16.74` |
+| A17 | `10.90.14.128` | `255.255.255.128` | `10.90.14.255` | `10.90.14.129 - 10.90.14.254` |
+| A18 | `10.90.16.76` | `255.255.255.252` | `10.90.16.79` | `10.90.16.77 - 10.90.16.78` |
+| A19 | `10.90.15.128` | `255.255.255.192` | `10.90.15.191` | `10.90.15.129 - 10.90.15.190` |
+| A20 | `10.90.16.80` | `255.255.255.252` | `10.90.16.83` | `10.90.16.81 - 10.90.16.82` |
+| A21 | `10.90.16.48` | `255.255.255.248` | `10.90.16.55` | `10.90.16.49 - 10.90.16.54` |
+| A22 | `10.90.16.84` | `255.255.255.252` | `10.90.16.87` | `10.90.16.85 - 10.90.16.86` |
+| A23 | `10.90.16.0` | `255.255.255.224` | `10.90.16.31` | `10.90.16.1 - 10.90.16.30` |
+| A24 | `10.90.16.88` | `255.255.255.252` | `10.90.16.91` | `10.90.16.89 - 10.90.16.90` |
+| A25 | `10.90.15.192` | `255.255.255.192` | `10.90.15.255` | `10.90.15.193 - 10.90.15.254` |
+
+## V3. Routing
+
+Strategi sama seperti bagian 5 (default route ke arah Cyberia ditambah route ke subnet di sisi hilir). Bedanya, pada VLSM blok hilir tidak bersebelahan sehingga tidak bisa diringkas menjadi satu supernet per cabang.
+
+| Router | Route statis | Default route |
+|---|---|---|
+| Cyberia | 12 | - |
+| Wired | 16 | ya |
+| Navi | 0 | ya |
+| Tachibana | 7 | ya |
+| Psyche | 0 | ya |
+| Copland | 0 | ya |
+| Schumann | 1 | ya |
+| Accela | 0 | ya |
+| Deus | 5 | ya |
+| Protocol7 | 5 | ya |
+| Knights | 3 | ya |
+| Phantoma | 1 | ya |
+| Shibuya | 0 | ya |
+| **Total** | **50** | 12 |
+
+## V4. Konfigurasi Router
+
+Masuk ke CLI tiap router.
+
+#### Cyberia
+![alt text](<assets/Screenshot 2026-11-05 070453.png>)
+```
+enable
+configure terminal
+interface fa0/1
+ ip address 10.90.14.1 255.255.255.128
+ no shutdown
+ exit
+interface fa1/0
+ ip address 10.90.16.57 255.255.255.252
+ no shutdown
+ exit
+ip route 10.90.0.0 255.255.248.0 10.90.16.58
+ip route 10.90.8.0 255.255.252.0 10.90.16.58
+ip route 10.90.12.0 255.255.254.0 10.90.16.58
+ip route 10.90.14.128 255.255.255.128 10.90.16.58
+ip route 10.90.15.0 255.255.255.0 10.90.16.58
+ip route 10.90.16.0 255.255.255.224 10.90.16.58
+ip route 10.90.16.32 255.255.255.240 10.90.16.58
+ip route 10.90.16.48 255.255.255.248 10.90.16.58
+ip route 10.90.16.60 255.255.255.252 10.90.16.58
+ip route 10.90.16.64 255.255.255.240 10.90.16.58
+ip route 10.90.16.80 255.255.255.248 10.90.16.58
+ip route 10.90.16.88 255.255.255.252 10.90.16.58
+end
+write memory
+```
+
+#### Wired
+![alt text](<assets/Screenshot 2026-11-05 070530.png>)
+```
+enable
+configure terminal
+interface fa1/0
+ ip address 10.90.16.58 255.255.255.252
+ no shutdown
+ exit
+interface fa0/1
+ ip address 10.90.16.61 255.255.255.252
+ no shutdown
+ exit
+interface fa1/1
+ ip address 10.90.16.65 255.255.255.252
+ no shutdown
+ exit
+interface fa0/0
+ ip address 10.90.16.33 255.255.255.248
+ no shutdown
+ exit
+ip route 10.90.0.0 255.255.252.0 10.90.16.34
+ip route 10.90.4.0 255.255.252.0 10.90.16.36
+ip route 10.90.8.0 255.255.254.0 10.90.16.35
+ip route 10.90.10.0 255.255.254.0 10.90.16.66
+ip route 10.90.12.0 255.255.254.0 10.90.16.62
+ip route 10.90.14.128 255.255.255.128 10.90.16.66
+ip route 10.90.15.0 255.255.255.192 10.90.16.35
+ip route 10.90.15.64 255.255.255.192 10.90.16.62
+ip route 10.90.15.128 255.255.255.128 10.90.16.66
+ip route 10.90.16.0 255.255.255.224 10.90.16.66
+ip route 10.90.16.40 255.255.255.248 10.90.16.36
+ip route 10.90.16.48 255.255.255.248 10.90.16.66
+ip route 10.90.16.68 255.255.255.252 10.90.16.36
+ip route 10.90.16.72 255.255.255.248 10.90.16.66
+ip route 10.90.16.80 255.255.255.248 10.90.16.66
+ip route 10.90.16.88 255.255.255.252 10.90.16.66
+ip route 0.0.0.0 0.0.0.0 10.90.16.57
+end
+write memory
+```
+
+#### Navi
+![alt text](<assets/Screenshot 2026-11-05 070609.png>)
+```
+enable
+configure terminal
+interface fa0/0
+ ip address 10.90.16.62 255.255.255.252
+ no shutdown
+ exit
+interface fa1/0
+ ip address 10.90.12.1 255.255.255.0
+ no shutdown
+ exit
+interface fa0/1
+ ip address 10.90.15.65 255.255.255.192
+ no shutdown
+ exit
+interface fa1/1
+ ip address 10.90.13.1 255.255.255.0
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.90.16.61
+end
+write memory
+```
+
+#### Tachibana
+![alt text](<assets/Screenshot 2026-11-05 070636.png>)
+```
+enable
+configure terminal
+interface fa1/0
+ ip address 10.90.16.66 255.255.255.252
+ no shutdown
+ exit
+interface fa0/0
+ ip address 10.90.10.1 255.255.254.0
+ no shutdown
+ exit
+interface fa0/1
+ ip address 10.90.16.73 255.255.255.252
+ no shutdown
+ exit
+ip route 10.90.14.128 255.255.255.128 10.90.16.74
+ip route 10.90.15.128 255.255.255.128 10.90.16.74
+ip route 10.90.16.0 255.255.255.224 10.90.16.74
+ip route 10.90.16.48 255.255.255.248 10.90.16.74
+ip route 10.90.16.76 255.255.255.252 10.90.16.74
+ip route 10.90.16.80 255.255.255.248 10.90.16.74
+ip route 10.90.16.88 255.255.255.252 10.90.16.74
+ip route 0.0.0.0 0.0.0.0 10.90.16.65
+end
+write memory
+```
+
+#### Psyche
+![alt text](<assets/Screenshot 2026-11-05 070659.png>)
+```
+enable
+configure terminal
+interface fa0/0
+ ip address 10.90.16.34 255.255.255.248
+ no shutdown
+ exit
+interface fa0/1
+ ip address 10.90.0.1 255.255.252.0
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.90.16.33
+end
+write memory
+```
+
+#### Copland
+![alt text](<assets/Screenshot 2026-11-05 070721.png>)
+```
+enable
+configure terminal
+interface fa0/0
+ ip address 10.90.16.35 255.255.255.248
+ no shutdown
+ exit
+interface fa0/1
+ ip address 10.90.15.1 255.255.255.192
+ no shutdown
+ exit
+interface fa1/0
+ ip address 10.90.8.1 255.255.254.0
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.90.16.33
+end
+write memory
+```
+
+#### Schumann
+![alt text](<assets/Screenshot 2026-11-05 070747.png>)
+```
+enable
+configure terminal
+interface fa0/0
+ ip address 10.90.16.36 255.255.255.248
+ no shutdown
+ exit
+interface fa0/1
+ ip address 10.90.16.41 255.255.255.248
+ no shutdown
+ exit
+interface fa1/0
+ ip address 10.90.16.69 255.255.255.252
+ no shutdown
+ exit
+ip route 10.90.4.0 255.255.252.0 10.90.16.70
+ip route 0.0.0.0 0.0.0.0 10.90.16.33
+end
+write memory
+```
+
+#### Accela
+![alt text](<assets/Screenshot 2026-11-05 070818.png>)
+```
+enable
+configure terminal
+interface fa0/1
+ ip address 10.90.16.70 255.255.255.252
+ no shutdown
+ exit
+interface fa0/0
+ ip address 10.90.4.1 255.255.252.0
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.90.16.69
+end
+write memory
+```
+
+#### Deus
+![alt text](<assets/Screenshot 2026-11-05 070841.png>)
+```
+enable
+configure terminal
+interface fa0/1
+ ip address 10.90.16.74 255.255.255.252
+ no shutdown
+ exit
+interface fa0/0
+ ip address 10.90.14.129 255.255.255.128
+ no shutdown
+ exit
+interface fa1/0
+ ip address 10.90.16.77 255.255.255.252
+ no shutdown
+ exit
+ip route 10.90.15.128 255.255.255.128 10.90.16.78
+ip route 10.90.16.0 255.255.255.224 10.90.16.78
+ip route 10.90.16.48 255.255.255.248 10.90.16.78
+ip route 10.90.16.80 255.255.255.248 10.90.16.78
+ip route 10.90.16.88 255.255.255.252 10.90.16.78
+ip route 0.0.0.0 0.0.0.0 10.90.16.73
+end
+write memory
+```
+
+#### Protocol7
+![alt text](<assets/Screenshot 2026-11-05 070901.png>)
+```
+enable
+configure terminal
+interface fa0/1
+ ip address 10.90.16.78 255.255.255.252
+ no shutdown
+ exit
+interface fa0/0
+ ip address 10.90.15.129 255.255.255.192
+ no shutdown
+ exit
+interface fa1/0
+ ip address 10.90.16.81 255.255.255.252
+ no shutdown
+ exit
+ip route 10.90.15.192 255.255.255.192 10.90.16.82
+ip route 10.90.16.0 255.255.255.224 10.90.16.82
+ip route 10.90.16.48 255.255.255.248 10.90.16.82
+ip route 10.90.16.84 255.255.255.252 10.90.16.82
+ip route 10.90.16.88 255.255.255.252 10.90.16.82
+ip route 0.0.0.0 0.0.0.0 10.90.16.77
+end
+write memory
+```
+
+#### Knights
+![alt text](<assets/Screenshot 2026-11-05 070921.png>)
+```
+enable
+configure terminal
+interface fa0/1
+ ip address 10.90.16.82 255.255.255.252
+ no shutdown
+ exit
+interface fa0/0
+ ip address 10.90.16.49 255.255.255.248
+ no shutdown
+ exit
+interface fa1/0
+ ip address 10.90.16.85 255.255.255.252
+ no shutdown
+ exit
+ip route 10.90.15.192 255.255.255.192 10.90.16.86
+ip route 10.90.16.0 255.255.255.224 10.90.16.86
+ip route 10.90.16.88 255.255.255.252 10.90.16.86
+ip route 0.0.0.0 0.0.0.0 10.90.16.81
+end
+write memory
+```
+
+#### Phantoma
+![alt text](<assets/Screenshot 2026-11-05 070940.png>)
+```
+enable
+configure terminal
+interface fa1/0
+ ip address 10.90.16.86 255.255.255.252
+ no shutdown
+ exit
+interface fa0/1
+ ip address 10.90.16.1 255.255.255.224
+ no shutdown
+ exit
+interface fa0/0
+ ip address 10.90.16.89 255.255.255.252
+ no shutdown
+ exit
+ip route 10.90.15.192 255.255.255.192 10.90.16.90
+ip route 0.0.0.0 0.0.0.0 10.90.16.85
+end
+write memory
+```
+
+#### Shibuya
+![alt text](<assets/Screenshot 2026-11-05 071003.png>)
+```
+enable
+configure terminal
+interface fa0/0
+ ip address 10.90.16.90 255.255.255.252
+ no shutdown
+ exit
+interface fa0/1
+ ip address 10.90.15.193 255.255.255.192
+ no shutdown
+ exit
+ip route 0.0.0.0 0.0.0.0 10.90.16.89
+end
+write memory
+```
+
+## V5. Konfigurasi Node
+
+Isi pada Desktop > IP Configuration > Static (hanya bagian IPv4).
+
+| Node | Subnet | IP Address | Subnet Mask | Default Gateway |
+|---|---|---|---|---|
+| JJ | A1 | 10.90.14.2 | 255.255.255.128 | 10.90.14.1 |
+| MyuMyu | A1 | 10.90.14.3 | 255.255.255.128 | 10.90.14.1 |
+| Karl | A6 | 10.90.0.2 | 255.255.252.0 | 10.90.0.1 |
+| Lin | A6 | 10.90.0.3 | 255.255.252.0 | 10.90.0.1 |
+| Juri | A7 | 10.90.15.2 | 255.255.255.192 | 10.90.15.1 |
+| Masayuki | A8 | 10.90.8.2 | 255.255.254.0 | 10.90.8.1 |
+| Akashic | A9 | 10.90.16.42 | 255.255.255.248 | 10.90.16.41 |
+| Omnipresence | A11 | 10.90.4.2 | 255.255.252.0 | 10.90.4.1 |
+| Denpa | A11 | 10.90.4.3 | 255.255.252.0 | 10.90.4.1 |
+| Alice | A12 | 10.90.12.2 | 255.255.255.0 | 10.90.12.1 |
+| Reika | A12 | 10.90.12.3 | 255.255.255.0 | 10.90.12.1 |
+| Taro | A13 | 10.90.15.66 | 255.255.255.192 | 10.90.15.65 |
+| Yasuo | A14 | 10.90.13.2 | 255.255.255.0 | 10.90.13.1 |
+| Miho | A14 | 10.90.13.3 | 255.255.255.0 | 10.90.13.1 |
+| Kuma | A14 | 10.90.13.4 | 255.255.255.0 | 10.90.13.1 |
+| Collective | A15 | 10.90.10.2 | 255.255.254.0 | 10.90.10.1 |
+| Ghost | A15 | 10.90.10.3 | 255.255.254.0 | 10.90.10.1 |
+| Lilith | A17 | 10.90.14.130 | 255.255.255.128 | 10.90.14.129 |
+| Specter | A17 | 10.90.14.131 | 255.255.255.128 | 10.90.14.129 |
+| Chisa | A19 | 10.90.15.130 | 255.255.255.192 | 10.90.15.129 |
+| Hodgeson | A19 | 10.90.15.131 | 255.255.255.192 | 10.90.15.129 |
+| Eiri | A21 | 10.90.16.50 | 255.255.255.248 | 10.90.16.49 |
+| Semi | A23 | 10.90.16.2 | 255.255.255.224 | 10.90.16.1 |
+| Lain | A25 | 10.90.15.194 | 255.255.255.192 | 10.90.15.193 |
+| Mika | A25 | 10.90.15.195 | 255.255.255.192 | 10.90.15.193 |
+
+## V6. Pengujian
+
+Node terjauh (Lain) berhasil ping ke JJ dengan 0% loss. TTL 120 menunjukkan paket melewati 8 router sesuai jalur. Ping pertama dapat `Request timed out` karena CPT masih melakukan ARP.
