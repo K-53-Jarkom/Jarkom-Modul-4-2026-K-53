@@ -136,7 +136,9 @@ Host tersambung ke switch lewat `eth0`. Tiga host terhubung **langsung** ke rout
 
 ### 4.3 Penggabungan (sheet Penggabungan - CIDR)
 
-**Tahap I**
+**Tahap I (Pemetaan & Prefix Dasar)**
+- **File Gambar:** `CIDR_v2_1_Langkah1_A.png`[cite: 3]
+- ![Langkah 1](assets/CIDR_v2_1_Langkah1_A.png)
 
 | Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
 |---|---|---|---|---|---|---|
@@ -148,7 +150,9 @@ Host tersambung ke switch lewat `eth0`. Tiga host terhubung **langsung** ke rout
 | B6 | A22 | /30 | A24 | /30 | /29 | `10.90.23.232/29` |
 | B7 | A2 | /30 | A3 | /30 | /29 | `10.90.24.136/29` |
 
-**Tahap II**
+**Tahap II (Perluasan Blok Subnet Varian A & B)**
+- **File Gambar:** `CIDR_v2_2_Langkah2_AB.png`[cite: 4]
+- ![Langkah 2](assets/CIDR_v2_2_Langkah2_AB.png)
 
 | Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
 |---|---|---|---|---|---|---|
@@ -159,7 +163,9 @@ Host tersambung ke switch lewat `eth0`. Tiga host terhubung **langsung** ke rout
 | C5 | A21 | /29 | B6 | /29 | /28 | `10.90.23.224/28` |
 | C6 | A5 | /29 | B7 | /29 | /28 | `10.90.24.128/28` |
 
-**Tahap III**
+**Tahap III (Agregasi Blok A, B, C, dan D)**
+- **File Gambar:** `CIDR_v2_3_Langkah3_ABCD.png`[cite: 5]
+- ![Langkah 3 ABCD](assets/CIDR_v2_3_Langkah3_ABCD.png)
 
 | Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
 |---|---|---|---|---|---|---|
@@ -167,47 +173,26 @@ Host tersambung ke switch lewat `eth0`. Tiga host terhubung **langsung** ke rout
 | D2 | C5 | /28 | A23 | /27 | /26 | `10.90.23.192/26` |
 | D3 | A4 | /30 | C6 | /28 | /27 | `10.90.24.128/27` |
 
-**Tahap IV**
+**Tahap IV & V**
+- **File Gambar:** `CIDR_v2_4_Langkah3_AH.png`[cite: 6]
+- ![Langkah 3 AH](assets/CIDR_v2_4_Langkah3_AH.png)
 
 | Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
 |---|---|---|---|---|---|---|
 | E1 | A25 | /26 | D2 | /26 | /25 | `10.90.23.128/25` |
 | E2 | D3 | /27 | A1 | /25 | /24 | `10.90.24.0/24` |
-
-**Tahap V**
-
-| Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
-|---|---|---|---|---|---|---|
 | F1 | B5 | /25 | E1 | /25 | /24 | `10.90.23.0/24` |
 
-**Tahap VI**
+**Tahap VI s.d. X (Supernetting Menyeluruh hingga K1)**
+- **File Gambar:** `CIDR_v2_5_Langkah3_AK.png`[cite: 7]
+- ![Langkah 3 AK](assets/CIDR_v2_5_Langkah3_AK.png)
 
 | Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
 |---|---|---|---|---|---|---|
 | G1 | C4 | /24 | F1 | /24 | /23 | `10.90.22.0/23` |
-
-**Tahap VII**
-
-| Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
-|---|---|---|---|---|---|---|
 | H1 | A15 | /23 | G1 | /23 | /22 | `10.90.20.0/22` |
-
-**Tahap VIII**
-
-| Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
-|---|---|---|---|---|---|---|
 | I1 | C3 | /22 | H1 | /22 | /21 | `10.90.16.0/21` |
-
-**Tahap IX**
-
-| Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
-|---|---|---|---|---|---|---|
 | J1 | E2 | /24 | I1 | /21 | /20 | `10.90.16.0/20` |
-
-**Tahap X**
-
-| Subnet | Gabungan 1 | Mask | Gabungan 2 | Mask | Hasil | Network |
-|---|---|---|---|---|---|---|
 | K1 | D1 | /20 | J1 | /20 | /19 | `10.90.0.0/19` |
 
 ### 4.4 Pohon pembagian IP
